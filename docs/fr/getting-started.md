@@ -11,7 +11,7 @@ abcjs-fx s'appuie sur la bibliothèque officielle [abcjs](https://www.abcjs.net/
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/abcjs-audio.css">
 
 <!-- lecteur abcjs-fx -->
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.0.0/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.1.0/src/abcjs-fx.js"></script>
 ```
 
 ?> Vous pouvez aussi télécharger `src/abcjs-fx.js` depuis le [dépôt](https://github.com/fxpar/abcjs-fx)

@@ -27,7 +27,7 @@ Un élément n'est jamais initialisé deux fois (`data-abcp-ready` est posé des
 
 | | |
 |---|---|
-| `AbcjsFx.version` | `"9.0.0"` |
+| `AbcjsFx.version` | `"9.1.0"` |
 | `AbcjsFx.players` | tous les lecteurs créés |
 | `AbcjsFx.pauseAll(sauf)` | met en pause tous les lecteurs sauf `sauf` |
 | `AbcjsFx.splitTunebook(texte)` | `{header, prefix, tunes:[{abc, title}]}` |

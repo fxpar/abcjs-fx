@@ -1,6 +1,6 @@
 /*!
  * abcjs-fx.js — Lecteur / éditeur ABC basé sur abcjs (>= 6.x)
- * Version 9.0.0 — https://github.com/fxpar/abcjs-fx — MIT
+ * Version 9.1.0 — https://github.com/fxpar/abcjs-fx — MIT
  *
  * Utilisation :
  *   <textarea data-abcjs-fx options='{"responsive":"resize"}'>X:1 ...</textarea>
@@ -22,7 +22,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "9.0.0";
+  var VERSION = "9.1.0";
 
   // ---------------------------------------------------------------- i18n
   var I18N = {
@@ -1044,6 +1044,8 @@
       return [];
     }
     injectCss();
+    // Patch facultatif des tablatures (accordages rentrants), s'il est chargé
+    if (global.AbcjsReentrantTab && !global.AbcjsReentrantTab.installed) global.AbcjsReentrantTab.install(ABCJS);
     root = root || document;
     var created = [];
     var nodes = root.querySelectorAll(SELECTOR);

@@ -39,8 +39,38 @@ K:C
 C D E F | G A B c |]
 </textarea>
 
-!> abcjs requires strings in ascending order, so a re-entrant ukulele (high G) cannot be described as a
-tablature. For ukulele **chord diagrams** (re-entrant tuning included), see [Chord diagrams](chord-diagrams.md).
+## Reentrant tunings (high-G ukulele, banjo…)
+
+On its own, abcjs requires strings in ascending order and rejects a high-G ukulele
+(*"C string lower than G string"*). The optional **`abcjs-reentrant-tab.js`** patch lifts this limit:
+load it right after abcjs, then give the tuning in the real string order.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.1.0/src/abcjs-reentrant-tab.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.1.0/src/abcjs-fx.js"></script>
+
+<textarea data-abcjs-fx
+  options='{"tablature": [{"instrument": "violin", "label": "Ukulele (%T)", "tuning": ["G", "C", "E", "A"]}]}'>…</textarea>
+```
+
+<textarea data-abcjs-fx options='{"tablature": [{"instrument": "violin", "label": "Ukulele (%T)", "tuning": ["G", "C", "E", "A"]}]}'>
+X:1
+T:High-G ukulele
+M:4/4
+L:1/4
+K:C
+C D E F | G A B c | "C"[CEGc]2 "Am"[CEAA]2 | "F"[CFAA]2 "G7"[DFGB]2 | "C"[CEGc]4 |]
+</textarea>
+
+* Notes are placed on the lowest fret available; in chords, one note per string, with the smallest
+  stretch — the C chord above becomes the usual `0 0 0 3`.
+* Use a 4-line instrument (`violin`, `mandolin`) for a 4-string tuning: the number of tab lines comes
+  from the instrument.
+* The patch does not modify abcjs: it hooks into its tablature plugin when the page loads. It also works
+  **without abcjs-fx**, with `ABCJS.renderAbc`. If a future abcjs version changes its internals, the
+  patch disables itself (warning in the console) and abcjs behaves as before.
+* Without the patch, an alternative is a low-G tuning (`["G,", "C", "E", "A"]`), as in the previous example.
 
 ## The white background
 

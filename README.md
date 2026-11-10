@@ -11,7 +11,7 @@ player, a tunebook menu and practice tools. No build step, no dependency other t
 ```html
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/abcjs-audio.css">
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.0.0/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.1.0/src/abcjs-fx.js"></script>
 
 <textarea data-abcjs-fx>
 X:1
@@ -33,7 +33,8 @@ K:C
 * **Live editor** — the score follows your typing; abcjs warnings are listed.
 * **Export** — MIDI (what you hear), ABC of the tune, whole tunebook with your edits.
 * **Display modes** — `editor`, `audio`, `midi` (player only), `paper` (score only).
-* **Tablature** — fret numbers on a white background, readable everywhere.
+* **Tablature** — fret numbers on a white background, readable everywhere; optional patch for
+  **reentrant tunings** (high-G ukulele, banjo) that abcjs rejects on its own.
 * **French / English interface** — browser language detected, language menu in the player (remembered),
   abcjs audio-bar tooltips translated; extensible to other languages.
 
@@ -65,6 +66,7 @@ by chord, and chords missing from the library get computed shapes.
 | [`src/abcjs-fx.js`](src/abcjs-fx.js) | the player (CSS included) |
 | [`src/abcjs-fx-diagrams.js`](src/abcjs-fx-diagrams.js) | optional chord diagrams extension |
 | [`src/chord-library.js`](src/chord-library.js) | ukulele & guitar chord shapes used by the extension (~115 kB) |
+| [`src/abcjs-reentrant-tab.js`](src/abcjs-reentrant-tab.js) | optional abcjs patch: reentrant tablature tunings (works without abcjs-fx too) |
 | [`docs/`](docs/) | documentation site ([Docsify](https://docsify.js.org)), published with GitHub Pages |
 | [`examples/`](examples/) | a standalone page to try the sources locally |
 | [`images/`](images/) | screenshots used in this README |

@@ -1,5 +1,14 @@
 # Changelog / Historique
 
+## 9.1.0 — 2026-11
+
+### Added / Ajouts
+- **`abcjs-reentrant-tab.js`**: optional runtime patch for abcjs tablatures — reentrant tunings
+  (high-G ukulele, 5-string banjo…), notes placed on the lowest fret, one note per string in chords with
+  the smallest stretch. Works with plain abcjs, without modifying it; disables itself if abcjs changes
+  its internals. abcjs-fx installs it automatically when it is loaded. / Patch facultatif pour les
+  accordages rentrants des tablatures abcjs.
+
 ## 9.0.0 — 2026-11
 
 First release as a standalone repository. / Première version publiée comme dépôt autonome.

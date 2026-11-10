@@ -40,9 +40,40 @@ K:C
 C D E F | G A B c |]
 </textarea>
 
-!> abcjs exige des cordes en ordre croissant : un ukulélé rentrant (Sol aigu) ne peut donc pas être
-décrit en tablature. Pour les **diagrammes d'accords** au ukulélé (accordage rentrant compris), voir
-[Diagrammes d'accords](fr/chord-diagrams.md).
+## Accordages rentrants (ukulélé à Sol aigu, banjo…)
+
+Seul, abcjs exige des cordes en ordre croissant et refuse un ukulélé à Sol aigu
+(*« C string lower than G string »*). Le patch facultatif **`abcjs-reentrant-tab.js`** lève cette limite :
+chargez-le juste après abcjs, puis donnez l'accordage dans l'ordre réel des cordes.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.1.0/src/abcjs-reentrant-tab.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.1.0/src/abcjs-fx.js"></script>
+
+<textarea data-abcjs-fx
+  options='{"tablature": [{"instrument": "violin", "label": "Ukulélé (%T)", "tuning": ["G", "C", "E", "A"]}]}'>…</textarea>
+```
+
+<textarea data-abcjs-fx options='{"tablature": [{"instrument": "violin", "label": "Ukulélé (%T)", "tuning": ["G", "C", "E", "A"]}]}'>
+X:1
+T:Ukulélé à Sol aigu
+M:4/4
+L:1/4
+K:C
+C D E F | G A B c | "C"[CEGc]2 "Am"[CEAA]2 | "F"[CFAA]2 "G7"[DFGB]2 | "C"[CEGc]4 |]
+</textarea>
+
+* Les notes sont placées sur la case la plus basse possible ; dans les accords, une note par corde,
+  avec l'écart le plus faible — l'accord de Do ci-dessus donne le doigté habituel `0 0 0 3`.
+* Pour un accordage à 4 cordes, utilisez un instrument à 4 lignes (`violin`, `mandolin`) : le nombre de
+  lignes de la tablature vient de l'instrument.
+* Le patch ne modifie pas abcjs : il se greffe sur son module de tablature au chargement de la page. Il
+  fonctionne aussi **sans abcjs-fx**, avec `ABCJS.renderAbc`. Si une future version d'abcjs change son
+  fonctionnement interne, le patch se désactive (avertissement dans la console) et abcjs se comporte
+  comme avant.
+* Sans le patch, une solution de repli est l'accordage à Sol grave (`["G,", "C", "E", "A"]`), comme
+  dans l'exemple précédent.
 
 ## Le fond blanc
 

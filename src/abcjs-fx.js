@@ -1,6 +1,6 @@
 /*!
  * abcjs-fx.js — Lecteur / éditeur ABC basé sur abcjs (>= 6.x)
- * Version 9.1.1 — https://github.com/fxpar/abcjs-fx — MIT
+ * Version 9.2.0 — https://github.com/fxpar/abcjs-fx — MIT
  *
  * Utilisation :
  *   <textarea data-abcjs-fx options='{"responsive":"resize"}'>X:1 ...</textarea>
@@ -22,7 +22,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "9.1.1";
+  var VERSION = "9.2.0";
 
   // ---------------------------------------------------------------- i18n
   var I18N = {

@@ -1,5 +1,17 @@
 # Changelog / Historique
 
+## 9.2.0 — 2026-11
+
+### Added / Ajouts
+- `abcjs-reentrant-tab.js` 1.1.0: **5-string banjo** — the short drone string starts at fret 5 (played
+  open or from fret 6); detected for `"instrument": "fiveString"` with a tuning such as `g D G B d`,
+  or set with the new `stringStartFret` option. At the same fret, full-length strings come first.
+  / Banjo 5 cordes : la corde de bourdon courte commence à la 5ᵉ case.
+
+### Changed / Modifié
+- Chords with more notes than strings: as many notes as possible get a string, the others show "?"
+  (they could be stacked on one string before). / Plus jamais deux notes sur la même corde.
+
 ## 9.1.1 — 2026-11
 
 ### Changed / Modifié

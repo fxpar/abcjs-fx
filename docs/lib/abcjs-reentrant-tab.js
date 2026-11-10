@@ -1,7 +1,7 @@
 /*!
  * abcjs-reentrant-tab.js — reentrant tunings for abcjs tablatures
  * (high-G ukulele, 5-string banjo, baritone/12-string tricks…)
- * Version 1.0.1 — https://github.com/fxpar/abcjs-fx — MIT
+ * Version 1.1.0 — https://github.com/fxpar/abcjs-fx — MIT
  *
  * Works with plain abcjs (>= 6.2), with or without abcjs-fx. Load it after abcjs:
  *   <script src="abcjs-basic-min.js"></script>
@@ -16,6 +16,8 @@
  *      the real tuning: lowest fret first (closest string to the previous note on ties); in chords, one
  *      note per string, minimizing the highest fret, then the sum of frets, then the stretch
  *      (same ranking as abcjs; on unisons, earlier notes go to lower strings).
+ *   5-string banjo (g D G B d, instrument "fiveString"): the drone string starts at fret 5, so it
+ *   is played open or from fret 6; option "stringStartFret": [5, 0, 0, 0, 0] sets it explicitly.
  * The string-assignment algorithm comes from a proposed change to abcjs by fxpar
  * (branch feature/tablatures-reentrant-tuning).
  *
@@ -25,7 +27,7 @@
   "use strict";
 
   var api = {
-    version: "1.0.1",
+    version: "1.1.0",
     installed: false,
     install: install,
     isReentrant: isReentrant,
@@ -81,15 +83,36 @@
     return pitch;
   }
 
-  /** Every string the note can be played on (fret >= 0), lowest fret first. */
+  /**
+   * Every string the note can be played on (fret >= 0), lowest fret first; at the same fret,
+   * full-length strings before a short string. A short string (5-string banjo drone) starts
+   * further up the neck: open = 0, then startFret + 1, startFret + 2...
+   */
   function candidates(sem, note) {
     var pitch = notePitch(note), list = [];
     for (var i = 0; i < sem.stringPitches.length; i++) {
       var fret = pitch - sem.stringPitches[i];
-      if (fret >= 0) list.push({ arrIndex: i, num: Math.round(fret) });
+      if (fret < 0) continue;
+      var start = (sem.__startFrets && sem.__startFrets[i]) || 0;
+      if (start > 0 && fret > 0) fret += start;
+      list.push({ arrIndex: i, num: Math.round(fret), short: start > 0 });
     }
-    list.sort(function (a, b) { return a.num - b.num; });
+    list.sort(function (a, b) { return a.num - b.num || a.short - b.short; });
     return list;
+  }
+
+  /**
+   * Fret where each string starts: "stringStartFret" tablature option (one value per tuning entry),
+   * or, for instrument "fiveString", 5 for a first string higher than the second (g D G B d).
+   */
+  function startFrets(params, pitches) {
+    var starts = pitches.map(function (p, i) {
+      var v = params && params.stringStartFret ? parseInt(params.stringStartFret[i], 10) : 0;
+      return v > 0 ? v : 0;
+    });
+    if (params && !params.stringStartFret && params.instrument === "fiveString" &&
+      pitches.length === 5 && pitches[0] > pitches[1]) starts[0] = 5;
+    return starts;
   }
 
   function place(sem, item, chosen) {
@@ -109,6 +132,7 @@
     if (sem.lastArrIndex != null) {
       list.sort(function (a, b) {
         if (a.num !== b.num) return a.num - b.num;
+        if (a.short !== b.short) return a.short - b.short;
         return Math.abs(a.arrIndex - sem.lastArrIndex) - Math.abs(b.arrIndex - sem.lastArrIndex);
       });
     }
@@ -167,11 +191,8 @@
   }
 
   function assignChord(sem, items) {
+    // also with more notes than strings: as many notes as possible, "?" for the others
     var real = items.filter(function (it) { return it && it.note; });
-    if (real.length > sem.stringPitches.length) {
-      real.forEach(function (it) { assignSingle(sem, it); });
-      return;
-    }
     var chosen = bestAssignment(real.map(function (it) { return candidates(sem, it.note); }));
     real.forEach(function (it, i) { place(sem, it, chosen[i]); });
   }
@@ -206,6 +227,7 @@
       sem.tuning = tuning; // label "%T" shows the real tuning
       sem.stringPitches = tuning.map(function (t) { return noteToMidi(t) + (sem.capo || 0); });
       sem.lastArrIndex = null;
+      sem.__startFrets = startFrets(params, sem.stringPitches);
       sem.__reentrant = true;
       patchSemantics(Object.getPrototypeOf(sem));
     };

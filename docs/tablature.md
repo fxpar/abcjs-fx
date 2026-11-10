@@ -56,8 +56,8 @@ load it right after abcjs, then give the tuning in the real string order.
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.1.1/src/abcjs-reentrant-tab.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.1.1/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.2.0/src/abcjs-reentrant-tab.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.2.0/src/abcjs-fx.js"></script>
 
 <textarea data-abcjs-fx
   options='{"tablature": [{"instrument": "violin", "label": "Ukulele (%T)", "tuning": ["G", "C", "E", "A"]}]}'>…</textarea>
@@ -78,6 +78,28 @@ C D E F | G A B c | "C"[CEGc]2 "Am"[CEAA]2 | "F"[CFAA]2 "G7"[DFGB]2 | "C"[CEGc]4
   **without abcjs-fx**, with `ABCJS.renderAbc`. If a future abcjs version changes its internals, the
   patch disables itself (warning in the console) and abcjs behaves as before.
 * Without the patch, an alternative is a low-G tuning (`["G,", "C", "E", "A"]`), as in the previous example.
+
+
+### 5-string banjo
+
+On a 5-string banjo, the 5th string (the high drone, written first in `g D G B d`) is **short**: it
+starts at the 5th fret, so it is played open (`0`) or from fret `6`. With `"instrument": "fiveString"`
+and a tuning whose first string is higher than the second, the patch knows it; at the same fret it
+prefers the full-length strings, so melodies go to the 1st string and the drone is played open.
+
+<textarea data-abcjs-fx mode="audio" options='{"tablature": [{"instrument": "fiveString", "label": "Banjo (%T)", "tuning": ["g", "D", "G", "B", "d"]}]}'>
+X:1
+T:Open G banjo: forward roll and melody
+M:4/4
+L:1/8
+K:G
+|G B g d G B g d | A B g d A B g d |
+|"G"[GBdg]4 "D7"[^FAcd]4 | g2 ^g2 a2 b2 |]
+</textarea>
+
+The `stringStartFret` option gives the starting fret of every string explicitly (one value per tuning
+entry), for instance `"stringStartFret": [5, 0, 0, 0, 0]`; `[0, 0, 0, 0, 0]` treats every string as
+full-length.
 
 ## The white background
 

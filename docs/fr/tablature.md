@@ -57,8 +57,8 @@ chargez-le juste après abcjs, puis donnez l'accordage dans l'ordre réel des co
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.1.1/src/abcjs-reentrant-tab.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.1.1/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.2.0/src/abcjs-reentrant-tab.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.2.0/src/abcjs-fx.js"></script>
 
 <textarea data-abcjs-fx
   options='{"tablature": [{"instrument": "violin", "label": "Ukulélé (%T)", "tuning": ["G", "C", "E", "A"]}]}'>…</textarea>
@@ -81,6 +81,29 @@ C D E F | G A B c | "C"[CEGc]2 "Am"[CEAA]2 | "F"[CFAA]2 "G7"[DFGB]2 | "C"[CEGc]4
   comme avant.
 * Sans le patch, une solution de repli est l'accordage à Sol grave (`["G,", "C", "E", "A"]`), comme
   dans l'exemple précédent.
+
+
+### Banjo 5 cordes
+
+Sur un banjo 5 cordes, la 5ᵉ corde (le bourdon aigu, écrit en premier dans `g D G B d`) est **courte** :
+elle commence à la 5ᵉ case, donc elle se joue à vide (`0`) ou à partir de la case `6`. Avec
+`"instrument": "fiveString"` et un accordage dont la première corde est plus aiguë que la deuxième, le
+patch le sait ; à case égale, il préfère les cordes entières : les mélodies passent sur la 1ʳᵉ corde et
+le bourdon se joue à vide.
+
+<textarea data-abcjs-fx mode="audio" options='{"tablature": [{"instrument": "fiveString", "label": "Banjo (%T)", "tuning": ["g", "D", "G", "B", "d"]}]}'>
+X:1
+T:Banjo en Sol ouvert : roulement et mélodie
+M:4/4
+L:1/8
+K:G
+|G B g d G B g d | A B g d A B g d |
+|"G"[GBdg]4 "D7"[^FAcd]4 | g2 ^g2 a2 b2 |]
+</textarea>
+
+L'option `stringStartFret` donne explicitement la case de départ de chaque corde (une valeur par corde
+de l'accordage), par exemple `"stringStartFret": [5, 0, 0, 0, 0]` ; `[0, 0, 0, 0, 0]` traite toutes les
+cordes comme entières.
 
 ## Le fond blanc
 

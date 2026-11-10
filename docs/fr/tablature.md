@@ -21,6 +21,38 @@ D | "G"G2 B/G/ | B2 A | "Em"G2 E | "C"D2 D | "G"G2 B/G/ | B2 A/B/ | "D"d3- | d2 
 "G"d2 B/d/ | B2 G | "C"D2 E | G2 E | "G"D2 D | G2 B/G/ | "D"B2 A | "G"G2 |]
 </textarea>
 
+## Choisir la tablature dans le lecteur
+
+Ouvrez <code>⋮</code> : le champ **Tablature** affiche la tablature prévue par l'auteur (ou *Aucune*) et
+permet de choisir un autre instrument, de taper n'importe quel accordage avec **Autre…**, et de régler un
+**capo**. Le choix ne concerne que ce lecteur.
+
+<textarea data-abcjs-fx options='{"tablature": [{"instrument": "guitar"}]}'>
+X:1
+T:Choisissez un instrument dans ⋮
+M:4/4
+L:1/4
+K:G
+"G"G A B c | "D7"d2 A2 | "G"B G "C"E c | "G"G4 |]
+</textarea>
+
+| Choix | Instrument | Accordage |
+|---|---|---|
+| `guitar` | guitare | Mi La Ré Sol Si Mi |
+| `guitar-dropd` | guitare | Ré La Ré Sol Si Mi |
+| `ukulele` | 4 lignes | Sol Do Mi La, Sol aigu — *seulement si `abcjs-reentrant-tab.js` est chargé* |
+| `ukulele-lowg` | 4 lignes | Sol grave, Do Mi La |
+| `mandolin` | mandoline | Sol Ré La Mi |
+| `violin` | violon | Sol Ré La Mi |
+| `banjo` | cinq cordes | g D G B d — *seulement avec le patch rentrant* |
+| **Autre…** | déduit du nombre de cordes (4, 5 ou 6) | tapé par le lecteur, ex. `D, A, D G B e` |
+
+* `tab-menu="false"` sur un lecteur retire le champ (pour un exercice qui doit rester sur son
+  instrument) ; `AbcjsFx.tabMenu = false` le retire sur tout le site.
+* `tab-instruments="ukulele,ukulele-lowg,custom"` réduit la liste (`custom` = *Autre…*).
+* Pas de champ en modes `midi` et `paper`, ni quand `options` déclare plusieurs portées de tablature.
+* **Réinitialiser** rétablit la tablature de l'auteur.
+
 ## Autres instruments et accordages
 
 abcjs connaît cinq instruments. **Le nombre de lignes de la tablature vient de l'instrument, pas de
@@ -57,8 +89,8 @@ chargez-le juste après abcjs, puis donnez l'accordage dans l'ordre réel des co
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.2.0/src/abcjs-reentrant-tab.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.2.0/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/abcjs-reentrant-tab.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/abcjs-fx.js"></script>
 
 <textarea data-abcjs-fx
   options='{"tablature": [{"instrument": "violin", "label": "Ukulélé (%T)", "tuning": ["G", "C", "E", "A"]}]}'>…</textarea>

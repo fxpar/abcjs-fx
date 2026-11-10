@@ -11,7 +11,7 @@ lecteur audio, menu de recueil et outils de travail. Aucune compilation, aucune 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/abcjs-audio.css">
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.2.0/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/abcjs-fx.js"></script>
 
 <textarea data-abcjs-fx>
 X:1
@@ -34,7 +34,8 @@ K:C
 * **Éditeur en direct** — la partition suit la frappe ; les avertissements d'abcjs sont listés.
 * **Export** — MIDI (ce que vous entendez), ABC du morceau, recueil complet avec vos modifications.
 * **Modes d'affichage** — `editor`, `audio`, `midi` (lecteur seul), `paper` (partition seule).
-* **Tablature** — numéros de case sur fond blanc, lisibles partout ; patch facultatif pour les
+* **Tablature** — instrument, accordage et capo choisis dans le lecteur ; numéros de case sur fond
+  blanc, lisibles partout ; patch facultatif pour les
   **accordages rentrants** (ukulélé à Sol aigu, banjo) qu'abcjs refuse seul.
 * **Interface en français / anglais** — langue du navigateur détectée, menu de langue dans le lecteur
   (mémorisé), infobulles de la barre audio d'abcjs traduites ; extensible à d'autres langues.

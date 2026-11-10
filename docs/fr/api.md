@@ -27,7 +27,7 @@ Un élément n'est jamais initialisé deux fois (`data-abcp-ready` est posé des
 
 | | |
 |---|---|
-| `AbcjsFx.version` | `"9.2.0"` |
+| `AbcjsFx.version` | `"9.3.0"` |
 | `AbcjsFx.players` | tous les lecteurs créés |
 | `AbcjsFx.pauseAll(sauf)` | met en pause tous les lecteurs sauf `sauf` |
 | `AbcjsFx.splitTunebook(texte)` | `{header, prefix, tunes:[{abc, title}]}` |
@@ -37,6 +37,8 @@ Un élément n'est jamais initialisé deux fois (`data-abcp-ready` est posé des
 | `AbcjsFx.forgetLanguage()` | oublie le choix du lecteur |
 | `AbcjsFx.defaultLang` | langue par défaut du site, prioritaire sur celle du navigateur (à définir avant la création des lecteurs) |
 | `AbcjsFx.resolveLang(element)` | la langue qu'aurait un nouveau lecteur |
+| `AbcjsFx.tabMenu` | `false` : pas de champ **Tablature** dans les panneaux <code>⋮</code> |
+| `AbcjsFx.tabPresets` | les instruments du champ **Tablature** |
 
 ## Un lecteur
 
@@ -49,6 +51,8 @@ Un élément n'est jamais initialisé deux fois (`data-abcp-ready` est posé des
 | `lecteur.state` | `{transpose, swing, chordsOff, metronome, countIn, muted}` |
 | `lecteur.voiceList()` | noms des voix, dans l'ordre d'abcjs |
 | `lecteur.lang`, `lecteur.setLanguage(code)` | langue de l'interface de ce lecteur seulement |
+| `lecteur.setTablature({preset, tuning, capo})` | tablature de ce lecteur : `preset` de la liste, `"none"` ou `"custom"` (avec `tuning: "D, A, D G B e"`) |
+| `lecteur.buildPanel()` | construit tout de suite le panneau <code>⋮</code> (sinon construit à sa première ouverture) |
 | `lecteur.editor` | l'`ABCJS.Editor` sous-jacent |
 | `lecteur.root`, `lecteur.paperEl`, `lecteur.textarea` | éléments du DOM |
 
@@ -86,6 +90,9 @@ AbcjsFx.plugins.push({
   },
   afterRender: function (lecteur) {      // après chaque dessin
     // lecteur.paperEl contient le SVG
+  },
+  buildPanel: function (lecteur) {       // à la construction du panneau ⋮ (première ouverture)
+    // lecteur.panelEl contient les contrôles
   }
 });
 ```

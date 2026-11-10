@@ -27,7 +27,7 @@ An element is never initialised twice (`data-abcp-ready` is set on it).
 
 | | |
 |---|---|
-| `AbcjsFx.version` | `"9.2.0"` |
+| `AbcjsFx.version` | `"9.3.0"` |
 | `AbcjsFx.players` | every player created |
 | `AbcjsFx.pauseAll(except)` | pauses every player but `except` |
 | `AbcjsFx.splitTunebook(text)` | `{header, prefix, tunes:[{abc, title}]}` |
@@ -37,6 +37,8 @@ An element is never initialised twice (`data-abcp-ready` is set on it).
 | `AbcjsFx.forgetLanguage()` | forgets the reader's choice |
 | `AbcjsFx.defaultLang` | site default language, used before the browser's (set it before the players are created) |
 | `AbcjsFx.resolveLang(element)` | the language a new player would get |
+| `AbcjsFx.tabMenu` | `false`: no **Tablature** field in the <code>⋮</code> panels |
+| `AbcjsFx.tabPresets` | the instruments of the **Tablature** field |
 
 ## A player
 
@@ -49,6 +51,8 @@ An element is never initialised twice (`data-abcp-ready` is set on it).
 | `player.state` | `{transpose, swing, chordsOff, metronome, countIn, muted}` |
 | `player.voiceList()` | voice names, in abcjs order |
 | `player.lang`, `player.setLanguage(code)` | interface language of this player only |
+| `player.setTablature({preset, tuning, capo})` | tablature of this player: `preset` from the list, `"none"` or `"custom"` (with `tuning: "D, A, D G B e"`) |
+| `player.buildPanel()` | builds the <code>⋮</code> panel now (it is otherwise built when first opened) |
 | `player.editor` | the underlying `ABCJS.Editor` |
 | `player.root`, `player.paperEl`, `player.textarea` | DOM elements |
 
@@ -86,6 +90,9 @@ AbcjsFx.plugins.push({
   },
   afterRender: function (player) {      // after every drawing
     // player.paperEl contains the SVG
+  },
+  buildPanel: function (player) {       // when the ⋮ panel is built (first opening)
+    // player.panelEl contains the controls
   }
 });
 ```

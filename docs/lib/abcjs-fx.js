@@ -1,6 +1,6 @@
 /*!
  * abcjs-fx.js — Lecteur / éditeur ABC basé sur abcjs (>= 6.x)
- * Version 9.2.0 — https://github.com/fxpar/abcjs-fx — MIT
+ * Version 9.3.0 — https://github.com/fxpar/abcjs-fx — MIT
  *
  * Utilisation :
  *   <textarea data-abcjs-fx options='{"responsive":"resize"}'>X:1 ...</textarea>
@@ -22,7 +22,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "9.2.0";
+  var VERSION = "9.3.0";
 
   // ---------------------------------------------------------------- i18n
   var I18N = {
@@ -35,6 +35,12 @@
       source: "Code ABC (modifiable en direct)", midi: "⬇ MIDI", abc: "⬇ ABC",
       book: "⬇ Recueil complet", reset: "↺ Réinitialiser", noAudio: "Audio non supporté par ce navigateur.",
       warnings: "Avertissements", chords: "Accords :", colon: " :",
+      tab: "Tablature", tabNone: "Aucune", tabOther: "Autre…", capo: "Capo", tuning: "Accordage",
+      tuningPlaceholder: "ex. D, A, D G B e",
+      tuningError: "Accordage : 4 à 6 notes ABC séparées par des espaces (ex. D, A, D G B e).",
+      tabGuitar: "Guitare", tabDropD: "Guitare Drop D", tabUkulele: "Ukulélé (Sol aigu)",
+      tabUkuleleLowG: "Ukulélé (Sol grave)", tabMandolin: "Mandoline", tabViolin: "Violon",
+      tabBanjo: "Banjo 5 cordes (Sol ouvert)",
       voices: "Voix", voice: "Voix", muted: "coupée(s)", allOn: "Tout activer", solo: "Solo",
       soloTitle: "Écouter cette voix seule (re-cliquer : toutes)",
       langName: "Français", language: "Langue", sheet: "Partition",
@@ -52,6 +58,12 @@
       source: "ABC code (live edit)", midi: "⬇ MIDI", abc: "⬇ ABC",
       book: "⬇ Whole tunebook", reset: "↺ Reset", noAudio: "Audio is not supported by this browser.",
       warnings: "Warnings", chords: "Chords:", colon: ":",
+      tab: "Tablature", tabNone: "None", tabOther: "Other…", capo: "Capo", tuning: "Tuning",
+      tuningPlaceholder: "e.g. D, A, D G B e",
+      tuningError: "Tuning: 4 to 6 ABC notes separated by spaces (e.g. D, A, D G B e).",
+      tabGuitar: "Guitar", tabDropD: "Guitar drop D", tabUkulele: "Ukulele (high G)",
+      tabUkuleleLowG: "Ukulele (low G)", tabMandolin: "Mandolin", tabViolin: "Violin",
+      tabBanjo: "5-string banjo (open G)",
       voices: "Voices", voice: "Voice", muted: "muted", allOn: "Unmute all", solo: "Solo",
       soloTitle: "Listen to this voice alone (click again: all)",
       langName: "English", language: "Language", sheet: "Sheet music",
@@ -106,6 +118,51 @@
 
   var DISPLAY_OPTIONS = { displayLoop: true, displayRestart: true, displayPlay: true, displayProgress: true, displayWarp: true };
 
+  // ---------------------------------------------------------------- tablature
+  // Accordages par défaut des instruments d'abcjs (le nombre de lignes vient de l'instrument)
+  var TAB_DEFAULT_TUNINGS = {
+    violin: ["G,", "D", "A", "e"], fiddle: ["G,", "D", "A", "e"], mandolin: ["G,", "D", "A", "e"],
+    fiveString: ["C,", "G,", "D", "A", "e"], guitar: ["E,", "A,", "D", "G", "B", "e"]
+  };
+  // Instrument choisi pour un accordage "Autre…", selon le nombre de cordes
+  var TAB_INSTRUMENT_BY_STRINGS = { 4: "violin", 5: "fiveString", 6: "guitar" };
+  // Choix proposés dans le menu ⋮ (reentrant : nécessite abcjs-reentrant-tab.js)
+  var TAB_PRESETS = [
+    { id: "guitar", instrument: "guitar", name: "tabGuitar" },
+    { id: "guitar-dropd", instrument: "guitar", tuning: ["D,", "A,", "D", "G", "B", "e"], name: "tabDropD" },
+    { id: "ukulele", instrument: "violin", tuning: ["G", "C", "E", "A"], name: "tabUkulele", reentrant: true },
+    { id: "ukulele-lowg", instrument: "violin", tuning: ["G,", "C", "E", "A"], name: "tabUkuleleLowG" },
+    { id: "mandolin", instrument: "mandolin", name: "tabMandolin" },
+    { id: "violin", instrument: "violin", name: "tabViolin" },
+    { id: "banjo", instrument: "fiveString", tuning: ["g", "D", "G", "B", "d"], name: "tabBanjo", reentrant: true }
+  ];
+  var TUNING_NOTE = /^(\^\^|__|\^|_|=)?[A-Ga-g](,*|'*)$/;
+
+  function tuningOf(tab) {
+    return (tab.tuning && tab.tuning.length ? tab.tuning : TAB_DEFAULT_TUNINGS[tab.instrument]) || [];
+  }
+
+  /** "G C E A" : accordage lisible, sans les marques d'octave. */
+  function tuningLabel(tuning) {
+    return tuning.map(function (n) {
+      var m = /^(\^\^|__|\^|_|=)?([A-Ga-g])/.exec(n);
+      if (!m) return n;
+      return m[2].toUpperCase() + (m[1] === "^" ? "♯" : m[1] === "_" ? "♭" : "");
+    }).join(" ");
+  }
+
+  /** "D, A, D G B e" -> ["D,", "A,", "D", "G", "B", "e"] ; null si invalide. */
+  function parseTuning(text) {
+    var notes = String(text || "").trim().split(/\s+/).filter(Boolean);
+    if (notes.length < 4 || notes.length > 6) return null;
+    for (var i = 0; i < notes.length; i++) if (!TUNING_NOTE.test(notes[i])) return null;
+    return notes;
+  }
+
+  function reentrantPatchReady() {
+    return !!(global.AbcjsReentrantTab && global.AbcjsReentrantTab.installed);
+  }
+
   // ---------------------------------------------------------------- CSS
   var CSS = [
     ".abcp{--abcp-accent:#0073aa;--abcp-border:#dee2e6;--abcp-bg:#f8f9fa;--abcp-text:#333;margin-bottom:20px;width:100%;font-family:system-ui,sans-serif;color:var(--abcp-text)}",
@@ -130,6 +187,11 @@
     ".abcp-panel[hidden]{display:none}",
     ".abcp-row{display:flex;gap:15px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}",
     ".abcp-row-end{margin-left:auto}",
+    ".abcp-field[hidden],.abcp-tab-error[hidden]{display:none}",
+    ".abcp-field input{padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:13px}",
+    ".abcp-field input[type=number]{width:4.5em}",
+    ".abcp-field{max-width:100%}.abcp-field select{max-width:100%}",
+    ".abcp-tab-error{color:#b32d2e;font-size:12px;margin:-4px 0 10px}",
     ".abcp-field{display:flex;flex-direction:column;gap:4px}",
     ".abcp-field>span{font-weight:bold}",
     ".abcp-field select{padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:13px}",
@@ -361,6 +423,14 @@
     this.t = I18N[this.lang];
     this._tr = []; // éléments traduits : retraduits à chaud par setLanguage()
     this.options = Object.assign({}, cfg.options);
+    // Tablature prévue par l'auteur (première portée) : point de départ du menu ⋮ et de "Réinitialiser"
+    var tabs = this.options.tablature;
+    this.authorTab = tabs && tabs.length === 1 && tabs[0] ? JSON.parse(JSON.stringify(tabs[0])) : null;
+    // Menu de tablature : pas en mode midi (pas de partition), pas pour plusieurs portées de tab,
+    // désactivable par l'auteur (tab-menu="false") ou pour tout le site (AbcjsFx.tabMenu = false)
+    this.tabMenu = this.mode !== "midi" && this.mode !== "paper" && !(tabs && tabs.length > 1) &&
+      cfg.tabMenu !== false && AbcjsFx.tabMenu !== false;
+    this.tabPresetIds = cfg.tabInstruments || null; // liste réduite (attribut tab-instruments)
     // Les classes SVG (dont abcjs-tab-number) servent au fond blanc des chiffres de tab
     if (this.options.tablature && this.options.add_classes === undefined) this.options.add_classes = true;
     // Extensions (ex. abcjs-fx-diagrams.js) : peuvent ajuster les options avant le premier rendu
@@ -391,8 +461,80 @@
       metronome: false,
       countIn: false,
       // Voix coupées, repérées par leur nom : le choix suit d'un morceau à l'autre du recueil
-      muted: {}
+      muted: {},
+      tab: this.authorTabState()
     };
+  };
+
+  /** Réglage de tablature de l'auteur : { preset: id | "none" | "custom", tuning, capo }. */
+  Player.prototype.authorTabState = function () {
+    var a = this.authorTab;
+    if (!a) return { preset: "none", tuning: null, capo: 0 };
+    var tuning = tuningOf(a), key = a.instrument + "|" + tuning.join(" ");
+    var preset = "custom";
+    TAB_PRESETS.forEach(function (p) { if (p.instrument + "|" + tuningOf(p).join(" ") === key) preset = p.id; });
+    return { preset: preset, tuning: tuning, capo: parseInt(a.capo, 10) || 0 };
+  };
+
+  /** Paramètres de tablature abcjs correspondant à l'état (null : pas de tablature). */
+  Player.prototype.tabParams = function () {
+    var st = this.state.tab, a = this.authorTab, tab;
+    if (st.preset === "none") return null;
+    if (st.preset === "custom") {
+      tab = { instrument: TAB_INSTRUMENT_BY_STRINGS[st.tuning.length], tuning: st.tuning.slice() };
+    } else {
+      var p = TAB_PRESETS.filter(function (x) { return x.id === st.preset; })[0];
+      tab = { instrument: p.instrument };
+      if (p.tuning) tab.tuning = p.tuning.slice();
+    }
+    // Les autres réglages de l'auteur (étiquette, highestNote...) sont gardés
+    if (a) {
+      Object.keys(a).forEach(function (k) {
+        if (k !== "instrument" && k !== "tuning" && k !== "capo" && tab[k] === undefined) tab[k] = a[k];
+      });
+      // Étiquette de l'auteur : elle nommait son instrument, on la remplace si l'instrument change
+      var sameAsAuthor = this.authorTabState().preset === st.preset &&
+        tuningOf(a).join(" ") === tuningOf(tab).join(" ");
+      if (a.label && !sameAsAuthor) {
+        var name = st.preset === "custom" ? "" : this.t[TAB_PRESETS.filter(function (x) { return x.id === st.preset; })[0].name];
+        tab.label = (name ? name + " " : "") + "(%T)";
+      }
+    }
+    if (st.capo > 0) tab.capo = st.capo;
+    return tab;
+  };
+
+  /**
+   * Réglage de tablature par programme (ex. un outil "appliquer à tous" sur une page d'exercices).
+   * @param {Object} choice { preset: "guitar" | "ukulele" | … | "none" | "custom", tuning: "D, A, D G B e" ou tableau, capo: 2 }
+   * @return {boolean} false si l'accordage "custom" est invalide
+   */
+  Player.prototype.setTablature = function (choice) {
+    if (!this.editor) return false;
+    var tab = this.state.tab, preset = choice.preset || tab.preset;
+    if (preset === "custom") {
+      var tuning = Array.isArray(choice.tuning) ? choice.tuning : parseTuning(choice.tuning);
+      if (!tuning || !TAB_INSTRUMENT_BY_STRINGS[tuning.length]) return false;
+      tab.tuning = tuning;
+    }
+    tab.preset = preset;
+    if (choice.capo !== undefined) tab.capo = Math.max(0, Math.min(12, parseInt(choice.capo, 10) || 0));
+    this.syncControls();
+    this.applyTablature();
+    return true;
+  };
+
+  /** Applique la tablature choisie dans le menu ⋮ (nouveau rendu). */
+  Player.prototype.applyTablature = function () {
+    var tab = this.tabParams();
+    this.options.tablature = tab ? [tab] : undefined;
+    if (tab && this.options.add_classes === undefined) this.options.add_classes = true;
+    this.pause();
+    // abcjs complète les paramètres de tablature : on lui en donne toujours une copie neuve
+    this.editor.paramChanged({
+      tablature: tab ? [JSON.parse(JSON.stringify(tab))] : null,
+      add_classes: this.options.add_classes
+    });
   };
 
   /**
@@ -443,7 +585,31 @@
     }), "more", "title");
     this.root.appendChild(h("div", { className: "abcp-bar" }, [this.audioEl, this.toggleBtn]));
 
-    // Panneau d'options
+    // Panneau d'options : vide jusqu'à sa première ouverture (voir buildPanel). Sur une page de
+    // dizaines d'exercices, les contrôles ne sont créés que pour les panneaux réellement ouverts.
+    this.panelEl = h("div", { className: "abcp-panel", id: id + "-panel", hidden: true });
+    this.root.appendChild(this.panelEl);
+
+    // Le textarea sert d'éditeur à abcjs dès le départ : il attend, masqué, la construction du panneau
+    // (on réutilise le textarea d'origine s'il existe : compatibilité v8)
+    var ta = cfg.textarea || h("textarea");
+    ta.className = "abcp-textarea";
+    ta.setAttribute("spellcheck", "false");
+    ta.removeAttribute("style");
+    this.textarea = ta;
+    this.textareaHolder = h("div", { hidden: true }, [ta]);
+    this.root.appendChild(this.textareaHolder);
+
+    this.refreshTuneList();
+  };
+
+  /** Construit le contenu du panneau ⋮ (une seule fois, à la première ouverture). */
+  Player.prototype.buildPanel = function () {
+    if (this.panelBuilt || this.mode === "paper") return;
+    this.panelBuilt = true;
+    var self = this, id = this.id;
+    var tr = this.tr.bind(this);
+
     this.transposeEl = h("select", { id: id + "-tr" });
     for (var s = -12; s <= 12; s++) {
       this.transposeEl.appendChild(h("option", { value: s, text: (s > 0 ? "+" : "") + s, selected: s === 0 }));
@@ -469,41 +635,71 @@
 
     this.midiBtn = tr(h("button", { type: "button" }), "midi");
     this.abcBtn = tr(h("button", { type: "button" }), "abc");
-    this.bookBtn = tr(h("button", { type: "button", hidden: true }), "book");
+    this.bookBtn = tr(h("button", { type: "button", hidden: this.tunes.length < 2 }), "book");
     this.resetBtn = tr(h("button", { type: "button" }), "reset");
 
-    this.panelEl = h("div", { className: "abcp-panel", id: id + "-panel", hidden: true }, [
-      h("div", { className: "abcp-row" }, [
-        field("transpose", this.transposeEl),
-        field("swing", this.swingEl),
-        check("chordsOff", this.chordsOffEl),
-        check("metronome", this.metronomeEl),
-        check("countIn", this.countInEl),
-        h("span", { className: "abcp-row-end" }),
-        field("language", this.langEl)
-      ]),
-      h("div", { className: "abcp-actions" }, [this.midiBtn, this.abcBtn, this.bookBtn, this.resetBtn])
-    ]);
+    this.panelEl.appendChild(h("div", { className: "abcp-row" }, [
+      field("transpose", this.transposeEl),
+      field("swing", this.swingEl),
+      check("chordsOff", this.chordsOffEl),
+      check("metronome", this.metronomeEl),
+      check("countIn", this.countInEl),
+      h("span", { className: "abcp-row-end" }),
+      field("language", this.langEl)
+    ]));
 
-    // Zone d'édition : on réutilise le textarea d'origine s'il existe (compatibilité v8)
-    var ta = cfg.textarea || h("textarea");
-    ta.className = "abcp-textarea";
-    ta.setAttribute("spellcheck", "false");
-    ta.removeAttribute("style");
-    this.textarea = ta;
-    this.warningsEl = h("div", { className: "abcp-warnings", hidden: true, role: "status" });
+    // Tablature : instrument, accordage libre ("Autre…"), capo
+    if (this.tabMenu) {
+      this.tabEl = h("select", { id: id + "-tab" });
+      this.tabEl.appendChild(tr(h("option", { value: "none" }), "tabNone"));
+      var reentrantOk = reentrantPatchReady(), only = this.tabPresetIds;
+      TAB_PRESETS.forEach(function (p) {
+        if (p.reentrant && !reentrantOk) return; // accordage refusé par abcjs sans le patch
+        if (only && only.indexOf(p.id) < 0) return;
+        self.tabEl.appendChild(tr(h("option", { value: p.id }), function (tt) {
+          return tt[p.name] + " — " + tuningLabel(tuningOf(p));
+        }));
+      });
+      if (!only || only.indexOf("custom") >= 0 || this.state.tab.preset === "custom")
+        this.tabEl.appendChild(tr(h("option", { value: "custom" }), "tabOther"));
+      this.tuningEl = tr(h("input", { type: "text", id: id + "-tuning", size: 16, spellcheck: "false" }), "tuningPlaceholder", "placeholder");
+      this.capoEl = h("input", { type: "number", id: id + "-capo", min: 0, max: 12, step: 1, value: 0 });
+      this.tuningErrorEl = tr(h("div", { className: "abcp-tab-error", hidden: true, role: "alert" }), "tuningError");
+      this.tuningField = field("tuning", this.tuningEl);
+      this.capoField = field("capo", this.capoEl);
+      this.panelEl.appendChild(h("div", { className: "abcp-row abcp-tab-row" }, [
+        field("tab", this.tabEl), this.tuningField, this.capoField
+      ]));
+      this.panelEl.appendChild(this.tuningErrorEl);
+    }
+
+    this.panelEl.appendChild(h("div", { className: "abcp-actions" }, [this.midiBtn, this.abcBtn, this.bookBtn, this.resetBtn]));
+
+    // Zone d'édition (le textarea quitte sa cachette)
     var editorBox = h("label", { className: "abcp-editor", hidden: this.mode !== "editor" },
-      [tr(h("span"), "source"), ta]);
+      [tr(h("span"), "source"), this.textarea]);
     this.panelEl.appendChild(editorBox);
+    this.textareaHolder.remove();
+    this.warningsEl = h("div", { className: "abcp-warnings", hidden: true, role: "status" });
     this.panelEl.appendChild(this.warningsEl);
 
-    // Accordéon des voix, en bas du panneau (rempli après chaque rendu)
+    // Accordéon des voix, en bas du panneau
     this.voicesSummary = h("summary");
     this.voicesEl = h("details", { className: "abcp-voices", hidden: true }, [this.voicesSummary]);
     this.panelEl.appendChild(this.voicesEl);
 
-    this.root.appendChild(this.panelEl);
-    this.refreshTuneList();
+    this.bindPanelEvents();
+    this.syncControls();
+    this.renderWarnings();
+    this.renderVoices();
+    AbcjsFx.plugins.forEach(function (p) { if (p.buildPanel) p.buildPanel(self); });
+  };
+
+  Player.prototype.renderWarnings = function () {
+    if (!this.warningsEl) return;
+    var w = this._warnings || [];
+    this.warningsEl.hidden = !w.length;
+    this.warningsEl.textContent = w.length ? this.t.warnings + this.t.colon + "\n" + w.join("\n") : "";
   };
 
   /** (Re)construit la liste déroulante du recueil : au départ et après un collage de plusieurs morceaux. */
@@ -763,11 +959,11 @@
     addTabBackgrounds(this.paperEl);
     var warnings = (ed.tunes && ed.tunes[0] && ed.tunes[0].warnings) || [];
     if (warnings.length) {
-      this.warningsEl.textContent = this.t.warnings + " :\n" + warnings.map(stripHtml).join("\n");
-      this.warningsEl.hidden = false;
+      this._warnings = warnings.map(stripHtml);
     } else {
-      this.warningsEl.hidden = true;
+      this._warnings = [];
     }
+    this.renderWarnings();
     this.renderVoices();
     this.localizeAudioBar();
     this.emitRender();
@@ -866,12 +1062,47 @@
   };
 
   Player.prototype.syncControls = function () {
+    if (!this.panelBuilt) return;
     var st = this.state;
     this.transposeEl.value = st.transpose;
     this.swingEl.value = SWING_VALUES.some(function (s) { return s[1] === st.swing; }) ? st.swing : 50;
     this.chordsOffEl.checked = st.chordsOff;
     this.metronomeEl.checked = st.metronome;
     this.countInEl.checked = st.countIn;
+    if (this.tabEl) {
+      this.tabEl.value = st.tab.preset;
+      if (this.tabEl.value !== st.tab.preset) this.tabEl.value = "none"; // choix retiré de la liste
+      this.tuningEl.value = st.tab.preset === "custom" && st.tab.tuning ? st.tab.tuning.join(" ") : "";
+      this.capoEl.value = st.tab.capo;
+      this.updateTabFields();
+    }
+  };
+
+  /** Champ "Accordage" visible pour "Autre…", capo masqué sans tablature. */
+  Player.prototype.updateTabFields = function () {
+    var preset = this.tabEl.value;
+    this.tuningField.hidden = preset !== "custom";
+    this.capoField.hidden = preset === "none";
+    this.tuningErrorEl.hidden = true;
+  };
+
+  /** Lecture du bloc Tablature du panneau, puis nouveau rendu. */
+  Player.prototype.readTabControls = function () {
+    var preset = this.tabEl.value, tab = this.state.tab;
+    this.updateTabFields();
+    if (preset === "custom") {
+      var tuning = parseTuning(this.tuningEl.value);
+      if (!tuning) {
+        // Accordage vide ou incomplet : on attend une saisie valide (message seulement si quelque chose est tapé)
+        this.tuningErrorEl.hidden = !this.tuningEl.value.trim();
+        if (!this.tuningEl.value.trim() && tab.preset !== "custom") this.tuningEl.focus();
+        return;
+      }
+      tab.tuning = tuning;
+    }
+    tab.preset = preset;
+    tab.capo = Math.max(0, Math.min(12, parseInt(this.capoEl.value, 10) || 0));
+    this.applyTablature();
   };
 
   Player.prototype.loadTune = function (index) {
@@ -914,21 +1145,15 @@
 
     this.toggleBtn.addEventListener("click", function () {
       var open = self.panelEl.hidden;
+      if (open) self.buildPanel(); // construit à la première ouverture
       self.panelEl.hidden = !open;
       self.toggleBtn.setAttribute("aria-expanded", String(open));
       self.toggleBtn.textContent = open ? "✕" : "⋮";
     });
 
     this.selectEl.addEventListener("change", function () { self.loadTune(parseInt(this.value, 10)); });
-    // Langue : s'applique à tous les lecteurs de la page et est mémorisée dans le navigateur
-    this.langEl.addEventListener("change", function () { AbcjsFx.setLanguage(this.value); });
     this.prevBtn.addEventListener("click", function () { self.loadTune(self.current - 1); });
     this.nextBtn.addEventListener("click", function () { self.loadTune(self.current + 1); });
-
-    // Réglages appliqués immédiatement (plus besoin du bouton "Mettre à jour")
-    [this.transposeEl, this.swingEl, this.chordsOffEl, this.metronomeEl, this.countInEl].forEach(function (el) {
-      el.addEventListener("change", function () { self.applySettings(); });
-    });
 
     // Les modifications du code sont mémorisées par morceau (non perdues en changeant de morceau)
     this.textarea.addEventListener("input", function (e) {
@@ -947,6 +1172,42 @@
       self.editor.fireChanged();
     });
 
+    // Lecture exclusive : démarrer un lecteur met les autres en pause
+    this.audioEl.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest(".abcjs-midi-start") && !self.isPlaying()) {
+        AbcjsFx.pauseAll(self);
+      }
+    }, true);
+
+    // Clic sur la partition (hors note) : lecture / pause
+    this.paperEl.addEventListener("click", function () {
+      if (Date.now() - self.noteClickAt < 400) return;
+      self.togglePlay();
+    });
+    // Clavier : Espace / Entrée sur la partition
+    this.paperEl.addEventListener("keydown", function (e) {
+      if (e.key === " " || e.key === "Enter") { e.preventDefault(); self.togglePlay(); }
+    });
+  };
+
+  /** Écouteurs des contrôles du panneau ⋮ (branchés à sa construction). */
+  Player.prototype.bindPanelEvents = function () {
+    var self = this;
+    // Langue : s'applique à tous les lecteurs de la page et est mémorisée dans le navigateur
+    this.langEl.addEventListener("change", function () { AbcjsFx.setLanguage(this.value); });
+
+    // Réglages appliqués immédiatement (plus besoin du bouton "Mettre à jour")
+    [this.transposeEl, this.swingEl, this.chordsOffEl, this.metronomeEl, this.countInEl].forEach(function (el) {
+      el.addEventListener("change", function () { self.applySettings(); });
+    });
+
+    if (this.tabEl) {
+      this.tabEl.addEventListener("change", function () { self.readTabControls(); });
+      this.capoEl.addEventListener("change", function () { self.readTabControls(); });
+      this.tuningEl.addEventListener("change", function () { self.readTabControls(); });
+      this.tuningEl.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); self.readTabControls(); } });
+    }
+
     this.midiBtn.addEventListener("click", function () { self.downloadMidi(); });
     this.abcBtn.addEventListener("click", function () {
       var tune = self.tunes[self.current];
@@ -964,29 +1225,12 @@
       var tune = self.tunes[self.current];
       tune.abc = tune.original;
       self.setText(tune.original);
+      var tabChanged = JSON.stringify(self.state.tab) !== JSON.stringify(self.authorTabState());
       self.state = self.defaultState();
       self.syncControls();
+      if (tabChanged && self.tabEl) self.applyTablature();
       self.applySettings();
     });
-
-    // Lecture exclusive : démarrer un lecteur met les autres en pause
-    this.audioEl.addEventListener("click", function (e) {
-      if (e.target.closest && e.target.closest(".abcjs-midi-start") && !self.isPlaying()) {
-        AbcjsFx.pauseAll(self);
-      }
-    }, true);
-
-    // Clic sur la partition (hors note) : lecture / pause
-    this.paperEl.addEventListener("click", function () {
-      if (Date.now() - self.noteClickAt < 400) return;
-      self.togglePlay();
-    });
-    // Clavier : Espace / Entrée sur la partition
-    this.paperEl.addEventListener("keydown", function (e) {
-      if (e.key === " " || e.key === "Enter") { e.preventDefault(); self.togglePlay(); }
-    });
-
-    this.syncControls();
   };
 
   Player.prototype.downloadMidi = function () {
@@ -1028,6 +1272,8 @@
       classAudio: attr(el, "class-audio"),
       className: isTextarea ? "" : el.className,
       lang: resolveLang(el),
+      tabMenu: attr(el, "tab-menu") === "false" ? false : undefined,
+      tabInstruments: attr(el, "tab-instruments") ? attr(el, "tab-instruments").split(/[\s,]+/).filter(Boolean) : null,
       textarea: isTextarea ? el : null,
       el: el, // élément source : les extensions y lisent leurs propres attributs
       attr: function (name) { return attr(el, name); }
@@ -1083,6 +1329,10 @@
     i18n: I18N,
     /** Langue par défaut imposée par le site (avant celle du navigateur), ex. "fr". */
     defaultLang: null,
+    /** false : pas de choix de tablature dans les panneaux ⋮ (tout le site). */
+    tabMenu: true,
+    /** Instruments proposés dans le menu de tablature (lecture seule). */
+    tabPresets: TAB_PRESETS,
     /** Langue d'un nouvel élément, selon l'ordre de priorité (voir resolveLang). */
     resolveLang: resolveLang,
     /** Change la langue de tous les lecteurs ; mémorisée dans le navigateur sauf {remember:false}. */

@@ -15,6 +15,8 @@ Les attributs se placent sur le `<textarea>`. Sur un `<div class="abcjs-fx">`, u
 | `chord-diag` | `true` `false` | `false` | liste des accords (transposés) au-dessus de la partition |
 | `class-paper` | classes CSS | – | classes ajoutées à la partition |
 | `class-audio` | classes CSS | – | classes ajoutées à la barre audio |
+| `tab-menu` | `true` `false` | `true` | champ **Tablature** du panneau <code>⋮</code> — voir [Tablature](fr/tablature.md#choisir-la-tablature-dans-le-lecteur) |
+| `tab-instruments` | identifiants séparés par des virgules | tous | choix proposés : `guitar` `guitar-dropd` `ukulele` `ukulele-lowg` `mandolin` `violin` `banjo` `custom` |
 | `lang` | `fr` `en` … | langue du navigateur | langue de l'interface, tant que le lecteur n'en a pas choisi une dans <code>⋮</code> — voir [Styles et langues](fr/customization.md) |
 
 ## Diagrammes d'accords (`abcjs-fx-diagrams.js`)

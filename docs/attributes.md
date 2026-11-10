@@ -15,6 +15,8 @@ Attributes go on the `<textarea>`. On a `<div class="abcjs-fx">`, use the `data-
 | `chord-diag` | `true` `false` | `false` | list of the chords (transposed) above the score |
 | `class-paper` | CSS classes | – | extra classes on the score |
 | `class-audio` | CSS classes | – | extra classes on the audio bar |
+| `tab-menu` | `true` `false` | `true` | **Tablature** field in <code>⋮</code> — see [Tablature](tablature.md#choosing-the-tablature-in-the-player) |
+| `tab-instruments` | ids, comma-separated | all | choices offered: `guitar` `guitar-dropd` `ukulele` `ukulele-lowg` `mandolin` `violin` `banjo` `custom` |
 | `lang` | `fr` `en` … | browser language | interface language, until the reader picks one in <code>⋮</code> — see [Styling & languages](customization.md) |
 
 ## Chord diagrams (`abcjs-fx-diagrams.js`)

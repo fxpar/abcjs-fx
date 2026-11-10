@@ -1,6 +1,6 @@
 /*!
  * abcjs-fx-diagrams.js — extension "diagrammes d'accords" pour abcjs-fx.js
- * Version 9.2.0 — https://github.com/fxpar/abcjs-fx — MIT
+ * Version 9.3.0 — https://github.com/fxpar/abcjs-fx — MIT
  *
  * Chargement (dans cet ordre) :
  *   abcjs-basic.js, abcjs-fx.js, chord-library.js (optionnel mais conseillé), abcjs-fx-diagrams.js
@@ -555,10 +555,11 @@
 
   function renderShapePanel(player) {
     var d = player.diagrams;
-    if (!player.panelEl) return;
+    // Le panneau ⋮ n'est construit qu'à sa première ouverture (voir le crochet buildPanel)
+    var actions = player.panelEl && player.panelEl.querySelector(".abcp-actions");
+    if (!actions) return;
     if (!d.panel) {
       d.panel = AbcjsFx.h("div", { className: "abcp-shapes" });
-      var actions = player.panelEl.querySelector(".abcp-actions");
       player.panelEl.insertBefore(d.panel, actions);
     }
     var panel = d.panel;
@@ -609,6 +610,9 @@
     },
     afterRender: function (player) {
       if (player.diagrams) decorate(player);
+    },
+    buildPanel: function (player) {
+      if (player.diagrams) renderShapePanel(player);
     }
   });
 

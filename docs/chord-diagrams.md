@@ -19,9 +19,9 @@ K:C
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.2.0/src/abcjs-fx.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.2.0/src/chord-library.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.2.0/src/abcjs-fx-diagrams.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/chord-library.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/abcjs-fx-diagrams.js"></script>
 
 <textarea data-abcjs-fx chord-diagrams="ukulele">…</textarea>
 ```

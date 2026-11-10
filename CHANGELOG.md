@@ -1,5 +1,18 @@
 # Changelog / Historique
 
+## 9.3.0 — 2026-11
+
+### Added / Ajouts
+- **Tablature** field in the ⋮ panel: none, guitar, drop D, ukulele (high G with the reentrant patch,
+  low G), mandolin, violin, banjo, or **Other…** with a typed tuning (instrument chosen from the number
+  of strings), plus a **capo**. Per player; `tab-menu="false"`, `tab-instruments="…"`,
+  `AbcjsFx.tabMenu = false`; `player.setTablature()` for scripts. / Champ Tablature dans le panneau ⋮.
+- The ⋮ panel is built when first opened (lighter pages with many exercises); `player.buildPanel()`,
+  `buildPanel` hook for extensions. / Panneau ⋮ construit à sa première ouverture.
+
+### Fixed / Corrigé
+- Warnings heading used the French punctuation in English.
+
 ## 9.2.0 — 2026-11
 
 ### Added / Ajouts

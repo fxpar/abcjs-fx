@@ -10,7 +10,7 @@ abcjs-fx needs the official [abcjs](https://www.abcjs.net/) library (6.4 or late
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/abcjs-audio.css">
 
 <!-- abcjs-fx player -->
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.4.0/src/abcjs-fx.js"></script>
 ```
 
 ?> You can also download `src/abcjs-fx.js` from the [repository](https://github.com/fxpar/abcjs-fx)

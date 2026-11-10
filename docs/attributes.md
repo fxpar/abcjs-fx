@@ -12,6 +12,7 @@ Attributes go on the `<textarea>`. On a `<div class="abcjs-fx">`, use the `data-
 | `options` | JSON | `{}` | abcjs options, for rendering **and** audio (`responsive`, `staffwidth`, `tablature`, `swing`, `chordsOff`, `format`…) |
 | `synth-options` | JSON | `{}` | audio-only abcjs options (`program`, `qpm`, `soundFontUrl`, `defaultQpm`…) |
 | `animate` | `true` `false` | `true` | animated cursor and highlighted notes |
+| `auto-scroll` | `true` `false` | `true` | page follows the line being played — see [Playback](playback.md#auto-scroll) |
 | `chord-diag` | `true` `false` | `false` | list of the chords (transposed) above the score |
 | `class-paper` | CSS classes | – | extra classes on the score |
 | `class-audio` | CSS classes | – | extra classes on the audio bar |

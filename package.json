@@ -1,6 +1,6 @@
 {
   "name": "abcjs-fx",
-  "version": "9.3.0",
+  "version": "9.4.0",
   "description": "Drop-in ABC music player/editor built on abcjs: tunebooks, transposition, swing, metronome, count-in, voice muting, MIDI export, and chord diagrams in the score.",
   "main": "src/abcjs-fx.js",
   "files": [

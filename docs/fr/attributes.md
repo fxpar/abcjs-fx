@@ -12,6 +12,7 @@ Les attributs se placent sur le `<textarea>`. Sur un `<div class="abcjs-fx">`, u
 | `options` | JSON | `{}` | options abcjs, pour le rendu **et** le son (`responsive`, `staffwidth`, `tablature`, `swing`, `chordsOff`, `format`…) |
 | `synth-options` | JSON | `{}` | options abcjs réservées au son (`program`, `qpm`, `soundFontUrl`, `defaultQpm`…) |
 | `animate` | `true` `false` | `true` | curseur animé et notes surlignées |
+| `auto-scroll` | `true` `false` | `true` | la page suit la ligne jouée — voir [Lecture](fr/playback.md#défilement-automatique) |
 | `chord-diag` | `true` `false` | `false` | liste des accords (transposés) au-dessus de la partition |
 | `class-paper` | classes CSS | – | classes ajoutées à la partition |
 | `class-audio` | classes CSS | – | classes ajoutées à la barre audio |

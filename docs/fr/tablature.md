@@ -89,8 +89,8 @@ chargez-le juste après abcjs, puis donnez l'accordage dans l'ordre réel des co
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/abcjs-reentrant-tab.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.4.0/src/abcjs-reentrant-tab.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.4.0/src/abcjs-fx.js"></script>
 
 <textarea data-abcjs-fx
   options='{"tablature": [{"instrument": "violin", "label": "Ukulélé (%T)", "tuning": ["G", "C", "E", "A"]}]}'>…</textarea>

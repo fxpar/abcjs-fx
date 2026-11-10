@@ -1,6 +1,6 @@
 /*!
  * abcjs-fx.js — Lecteur / éditeur ABC basé sur abcjs (>= 6.x)
- * Version 9.3.0 — https://github.com/fxpar/abcjs-fx — MIT
+ * Version 9.4.0 — https://github.com/fxpar/abcjs-fx — MIT
  *
  * Utilisation :
  *   <textarea data-abcjs-fx options='{"responsive":"resize"}'>X:1 ...</textarea>
@@ -22,7 +22,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "9.3.0";
+  var VERSION = "9.4.0";
 
   // ---------------------------------------------------------------- i18n
   var I18N = {
@@ -35,6 +35,7 @@
       source: "Code ABC (modifiable en direct)", midi: "⬇ MIDI", abc: "⬇ ABC",
       book: "⬇ Recueil complet", reset: "↺ Réinitialiser", noAudio: "Audio non supporté par ce navigateur.",
       warnings: "Avertissements", chords: "Accords :", colon: " :",
+      autoScroll: "Défilement auto",
       tab: "Tablature", tabNone: "Aucune", tabOther: "Autre…", capo: "Capo", tuning: "Accordage",
       tuningPlaceholder: "ex. D, A, D G B e",
       tuningError: "Accordage : 4 à 6 notes ABC séparées par des espaces (ex. D, A, D G B e).",
@@ -58,6 +59,7 @@
       source: "ABC code (live edit)", midi: "⬇ MIDI", abc: "⬇ ABC",
       book: "⬇ Whole tunebook", reset: "↺ Reset", noAudio: "Audio is not supported by this browser.",
       warnings: "Warnings", chords: "Chords:", colon: ":",
+      autoScroll: "Auto-scroll",
       tab: "Tablature", tabNone: "None", tabOther: "Other…", capo: "Capo", tuning: "Tuning",
       tuningPlaceholder: "e.g. D, A, D G B e",
       tuningError: "Tuning: 4 to 6 ABC notes separated by spaces (e.g. D, A, D G B e).",
@@ -371,12 +373,16 @@
   // ---------------------------------------------------------------- curseur
   // Toujours fourni à abcjs, même sans animation : c'est lui qui porte
   // extraMeasuresAtBeginning (décalage du curseur et des temps de notes pendant le décompte).
-  function CursorControl(paperEl, animate) {
+  // onLine(ev) est appelé à chaque événement de lecture, même sans animation (défilement automatique).
+  function CursorControl(paperEl, animate, onLine) {
     var self = this;
     self.extraMeasuresAtBeginning = 0;
+    onLine = onLine || function () {};
     if (!animate) {
       self.beatSubdivisions = 2;
-      self.onStart = self.onEvent = self.onFinished = function () {};
+      self.onStart = function () { onLine(null); };
+      self.onEvent = function (ev) { if (!(ev.measureStart && ev.left === null)) onLine(ev); };
+      self.onFinished = function () {};
       return;
     }
     function clear() {
@@ -385,6 +391,7 @@
     }
     self.beatSubdivisions = 2;
     self.onStart = function () {
+      onLine(null);
       var svg = paperEl.querySelector("svg");
       if (!svg || svg.querySelector(".abcjs-cursor")) return;
       var cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -402,12 +409,61 @@
         cursor.setAttribute("x1", ev.left - 2); cursor.setAttribute("x2", ev.left - 2);
         cursor.setAttribute("y1", ev.top); cursor.setAttribute("y2", ev.top + ev.height);
       }
+      onLine(ev);
     };
     self.onFinished = function () {
       clear();
       var cursor = paperEl.querySelector("svg .abcjs-cursor");
       if (cursor) ["x1", "y1", "x2", "y2"].forEach(function (a) { cursor.setAttribute(a, 0); });
     };
+  }
+
+  // ---------------------------------------------------------------- défilement automatique
+  // Après un défilement manuel, on laisse la main au lecteur quelques secondes
+  var lastUserScroll = 0;
+  if (global.addEventListener) {
+    ["wheel", "touchmove"].forEach(function (type) {
+      global.addEventListener(type, function () { lastUserScroll = Date.now(); }, { passive: true });
+    });
+    global.addEventListener("keydown", function (e) {
+      if (/^(PageUp|PageDown|ArrowUp|ArrowDown|Home|End)$/.test(e.key)) lastUserScroll = Date.now();
+    });
+  }
+
+  /** Bloc défilant qui contient l'élément (null : la fenêtre). */
+  function scrollContainer(el) {
+    for (var p = el.parentElement; p && p !== document.body && p !== document.documentElement; p = p.parentElement) {
+      var oy = getComputedStyle(p).overflowY;
+      if ((oy === "auto" || oy === "scroll") && p.scrollHeight > p.clientHeight + 1) return p;
+    }
+    return null;
+  }
+
+  /**
+   * À chaque changement de ligne pendant la lecture : si la ligne jouée sort de la zone
+   * confortable (8 % – 85 % de la hauteur visible), elle est ramenée au premier quart.
+   * ev.top / ev.height : position de la ligne dans le SVG (unités du viewBox).
+   */
+  function followLine(player, ev) {
+    if (!ev) { player._lineKey = null; return; } // début de lecture
+    if (!player.state.autoScroll || ev.top == null || ev.height == null) return;
+    var key = Math.round(ev.top);
+    if (key === player._lineKey) return;
+    player._lineKey = key;
+    if (Date.now() - lastUserScroll < 2500) return;
+    var svg = player.paperEl.querySelector("svg");
+    if (!svg) return;
+    var r = svg.getBoundingClientRect();
+    if (!r.height) return; // partition masquée (mode midi)
+    var vb = svg.viewBox && svg.viewBox.baseVal;
+    var scale = vb && vb.height ? r.height / vb.height : 1;
+    var top = r.top + ev.top * scale, bottom = top + ev.height * scale;
+    var box = scrollContainer(player.root);
+    var area = box ? box.getBoundingClientRect() : { top: 0, bottom: global.innerHeight };
+    var h = area.bottom - area.top;
+    if (top >= area.top + h * 0.08 && bottom <= area.top + h * 0.85) return;
+    var delta = top - (area.top + h * 0.25);
+    (box || global).scrollBy({ top: delta, behavior: "smooth" });
   }
 
   // ---------------------------------------------------------------- lecteur
@@ -460,6 +516,8 @@
       chordsOff: o.chordsOff === true || o.chordsOff === "true",
       metronome: false,
       countIn: false,
+      // Défilement automatique : propre à ce lecteur (case du panneau ⋮)
+      autoScroll: this.cfg.autoScroll !== false && AbcjsFx.autoScroll !== false,
       // Voix coupées, repérées par leur nom : le choix suit d'un morceau à l'autre du recueil
       muted: {},
       tab: this.authorTabState()
@@ -623,6 +681,7 @@
     this.chordsOffEl = h("input", { type: "checkbox" });
     this.metronomeEl = h("input", { type: "checkbox" });
     this.countInEl = h("input", { type: "checkbox" });
+    this.autoScrollEl = h("input", { type: "checkbox" });
 
     // Langue de l'interface : toutes les langues de AbcjsFx.i18n
     this.langEl = h("select", { id: id + "-lang" });
@@ -644,6 +703,7 @@
       check("chordsOff", this.chordsOffEl),
       check("metronome", this.metronomeEl),
       check("countIn", this.countInEl),
+      check("autoScroll", this.autoScrollEl),
       h("span", { className: "abcp-row-end" }),
       field("language", this.langEl)
     ]));
@@ -853,7 +913,7 @@
 
     var params = this.renderParams();
     params.clickListener = function (abcelem) { self.onNoteClick(abcelem); };
-    this.cursor = new CursorControl(this.paperEl, this.cfg.animate !== false);
+    this.cursor = new CursorControl(this.paperEl, this.cfg.animate !== false, function (ev) { followLine(self, ev); });
 
     this.editor = new ABCJS.Editor(this.textarea, {
       canvas_id: this.paperEl,
@@ -1069,6 +1129,7 @@
     this.chordsOffEl.checked = st.chordsOff;
     this.metronomeEl.checked = st.metronome;
     this.countInEl.checked = st.countIn;
+    this.autoScrollEl.checked = st.autoScroll;
     if (this.tabEl) {
       this.tabEl.value = st.tab.preset;
       if (this.tabEl.value !== st.tab.preset) this.tabEl.value = "none"; // choix retiré de la liste
@@ -1201,6 +1262,9 @@
       el.addEventListener("change", function () { self.applySettings(); });
     });
 
+    // Défilement automatique : sans nouveau rendu ni pause
+    this.autoScrollEl.addEventListener("change", function () { self.state.autoScroll = this.checked; });
+
     if (this.tabEl) {
       this.tabEl.addEventListener("change", function () { self.readTabControls(); });
       this.capoEl.addEventListener("change", function () { self.readTabControls(); });
@@ -1272,6 +1336,7 @@
       classAudio: attr(el, "class-audio"),
       className: isTextarea ? "" : el.className,
       lang: resolveLang(el),
+      autoScroll: attr(el, "auto-scroll") === "false" ? false : undefined,
       tabMenu: attr(el, "tab-menu") === "false" ? false : undefined,
       tabInstruments: attr(el, "tab-instruments") ? attr(el, "tab-instruments").split(/[\s,]+/).filter(Boolean) : null,
       textarea: isTextarea ? el : null,
@@ -1329,6 +1394,8 @@
     i18n: I18N,
     /** Langue par défaut imposée par le site (avant celle du navigateur), ex. "fr". */
     defaultLang: null,
+    /** false : défilement automatique désactivé par défaut (chaque lecteur peut le réactiver dans ⋮). */
+    autoScroll: true,
     /** false : pas de choix de tablature dans les panneaux ⋮ (tout le site). */
     tabMenu: true,
     /** Instruments proposés dans le menu de tablature (lecture seule). */

@@ -27,7 +27,7 @@ An element is never initialised twice (`data-abcp-ready` is set on it).
 
 | | |
 |---|---|
-| `AbcjsFx.version` | `"9.3.0"` |
+| `AbcjsFx.version` | `"9.4.0"` |
 | `AbcjsFx.players` | every player created |
 | `AbcjsFx.pauseAll(except)` | pauses every player but `except` |
 | `AbcjsFx.splitTunebook(text)` | `{header, prefix, tunes:[{abc, title}]}` |
@@ -37,6 +37,7 @@ An element is never initialised twice (`data-abcp-ready` is set on it).
 | `AbcjsFx.forgetLanguage()` | forgets the reader's choice |
 | `AbcjsFx.defaultLang` | site default language, used before the browser's (set it before the players are created) |
 | `AbcjsFx.resolveLang(element)` | the language a new player would get |
+| `AbcjsFx.autoScroll` | `false`: auto-scroll off by default (each player can turn it on in <code>⋮</code>) |
 | `AbcjsFx.tabMenu` | `false`: no **Tablature** field in the <code>⋮</code> panels |
 | `AbcjsFx.tabPresets` | the instruments of the **Tablature** field |
 
@@ -48,7 +49,7 @@ An element is never initialised twice (`data-abcp-ready` is set on it).
 | `player.isPlaying()` | `true` while playing |
 | `player.loadTune(index)` | show another tune of the book |
 | `player.tunes`, `player.current` | the book and the index of the tune shown |
-| `player.state` | `{transpose, swing, chordsOff, metronome, countIn, muted}` |
+| `player.state` | `{transpose, swing, chordsOff, metronome, countIn, autoScroll, muted, tab}` |
 | `player.voiceList()` | voice names, in abcjs order |
 | `player.lang`, `player.setLanguage(code)` | interface language of this player only |
 | `player.setTablature({preset, tuning, capo})` | tablature of this player: `preset` from the list, `"none"` or `"custom"` (with `tuning: "D, A, D G B e"`) |

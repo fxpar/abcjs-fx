@@ -27,7 +27,7 @@ Un élément n'est jamais initialisé deux fois (`data-abcp-ready` est posé des
 
 | | |
 |---|---|
-| `AbcjsFx.version` | `"9.3.0"` |
+| `AbcjsFx.version` | `"9.4.0"` |
 | `AbcjsFx.players` | tous les lecteurs créés |
 | `AbcjsFx.pauseAll(sauf)` | met en pause tous les lecteurs sauf `sauf` |
 | `AbcjsFx.splitTunebook(texte)` | `{header, prefix, tunes:[{abc, title}]}` |
@@ -37,6 +37,7 @@ Un élément n'est jamais initialisé deux fois (`data-abcp-ready` est posé des
 | `AbcjsFx.forgetLanguage()` | oublie le choix du lecteur |
 | `AbcjsFx.defaultLang` | langue par défaut du site, prioritaire sur celle du navigateur (à définir avant la création des lecteurs) |
 | `AbcjsFx.resolveLang(element)` | la langue qu'aurait un nouveau lecteur |
+| `AbcjsFx.autoScroll` | `false` : défilement automatique désactivé par défaut (chaque lecteur peut l'activer dans <code>⋮</code>) |
 | `AbcjsFx.tabMenu` | `false` : pas de champ **Tablature** dans les panneaux <code>⋮</code> |
 | `AbcjsFx.tabPresets` | les instruments du champ **Tablature** |
 
@@ -48,7 +49,7 @@ Un élément n'est jamais initialisé deux fois (`data-abcp-ready` est posé des
 | `lecteur.isPlaying()` | `true` pendant la lecture |
 | `lecteur.loadTune(index)` | afficher un autre morceau du recueil |
 | `lecteur.tunes`, `lecteur.current` | le recueil et l'indice du morceau affiché |
-| `lecteur.state` | `{transpose, swing, chordsOff, metronome, countIn, muted}` |
+| `lecteur.state` | `{transpose, swing, chordsOff, metronome, countIn, autoScroll, muted, tab}` |
 | `lecteur.voiceList()` | noms des voix, dans l'ordre d'abcjs |
 | `lecteur.lang`, `lecteur.setLanguage(code)` | langue de l'interface de ce lecteur seulement |
 | `lecteur.setTablature({preset, tuning, capo})` | tablature de ce lecteur : `preset` de la liste, `"none"` ou `"custom"` (avec `tuning: "D, A, D G B e"`) |

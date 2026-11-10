@@ -1,5 +1,13 @@
 # Changelog / Historique
 
+## 9.4.0 — 2026-11
+
+### Added / Ajouts
+- **Auto-scroll**: during playback, the page follows the line being played when it leaves the
+  comfortable part of the screen (window or scrolling block); pauses after a manual scroll. Per player:
+  **Auto-scroll** box in ⋮, `auto-scroll="false"`, site default `AbcjsFx.autoScroll = false`; also works
+  with `animate="false"`. / Défilement automatique pendant la lecture, réglable par lecteur.
+
 ## 9.3.0 — 2026-11
 
 ### Added / Ajouts

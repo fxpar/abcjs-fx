@@ -30,6 +30,18 @@ A red line follows the music and the notes being played are highlighted. Turn it
 <textarea data-abcjs-fx animate="false">…</textarea>
 ```
 
+## Auto-scroll
+
+During playback, when the line being played leaves the comfortable part of the screen, the page scrolls
+smoothly to bring it back near the top — useful for long tunes on small screens. Nothing moves while
+the line is already well visible, and the player stops following for a few seconds after the reader
+scrolls by hand.
+
+* Each player has an **Auto-scroll** box in <code>⋮</code>; unticking it only affects that player.
+* `auto-scroll="false"` on an exercise turns it off by default (the reader can tick it again);
+  `AbcjsFx.autoScroll = false` does the same for a whole site.
+* It works in a scrolling block too (sites whose content scrolls inside a frame), not only in the window.
+
 ## One player at a time
 
 Starting a player pauses the others on the page. Try it with the example on the

@@ -11,7 +11,7 @@ lecteur audio, menu de recueil et outils de travail. Aucune compilation, aucune 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/abcjs-audio.css">
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.4.0/src/abcjs-fx.js"></script>
 
 <textarea data-abcjs-fx>
 X:1
@@ -27,7 +27,7 @@ K:C
 
 ### Partition, audio et outils de travail
 
-* **Partition + audio** — synthétiseur, curseur animé, clic sur la partition pour lancer / suspendre,
+* **Partition + audio** — synthétiseur, curseur animé, défilement automatique, clic sur la partition pour lancer / suspendre,
   clic sur une note pour y sauter.
 * **Outils de travail** — transposition (partition, son et noms d'accords), swing, accords coupés,
   métronome, décompte d'une mesure (joué une seule fois en boucle).

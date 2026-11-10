@@ -1,6 +1,6 @@
 /*!
  * abcjs-fx-diagrams.js — extension "diagrammes d'accords" pour abcjs-fx.js
- * Version 9.3.0 — https://github.com/fxpar/abcjs-fx — MIT
+ * Version 9.4.0 — https://github.com/fxpar/abcjs-fx — MIT
  *
  * Chargement (dans cet ordre) :
  *   abcjs-basic.js, abcjs-fx.js, chord-library.js (optionnel mais conseillé), abcjs-fx-diagrams.js

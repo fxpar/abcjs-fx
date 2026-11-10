@@ -11,7 +11,7 @@ player, a tunebook menu and practice tools. No build step, no dependency other t
 ```html
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/abcjs-audio.css">
-<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.3.0/src/abcjs-fx.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fxpar/abcjs-fx@v9.4.0/src/abcjs-fx.js"></script>
 
 <textarea data-abcjs-fx>
 X:1
@@ -27,7 +27,7 @@ K:C
 
 ### Score, audio and practice tools
 
-* **Score + audio** — synthesizer, animated cursor, click the score to play / pause, click a note to jump.
+* **Score + audio** — synthesizer, animated cursor, auto-scroll, click the score to play / pause, click a note to jump.
 * **Practice tools** — transposition (score, sound and chord names), swing, chords off, metronome,
   one-bar count-in (played once in loop mode).
 * **Live editor** — the score follows your typing; abcjs warnings are listed.

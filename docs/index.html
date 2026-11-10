@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>abcjs-fx</title>
+  <meta name="description" content="abcjs-fx — ABC music player / editor built on abcjs: tunebooks, transposition, swing, metronome, voices, MIDI export, chord diagrams.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/themes/vue.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/abcjs-audio.css">
+  <link rel="stylesheet" href="assets/docs.css">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+</head>
+<body>
+  <div id="app">Loading…</div>
+
+  <!-- abcjs (official build) + abcjs-fx -->
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.7.2/dist/abcjs-basic-min.js"></script>
+  <script src="lib/abcjs-fx.js"></script>
+  <script src="lib/chord-library.js"></script>
+  <script src="lib/abcjs-fx-diagrams.js"></script>
+
+  <script>
+    /**
+     * Docsify plugin: the pages are rendered after DOMContentLoaded, so the players are
+     * initialised after every page change; audio from the previous page is stopped.
+     */
+    function abcjsFxDocs(hook, vm) {
+      hook.beforeEach(function (markdown) {
+        if (window.AbcjsFx) AbcjsFx.pauseAll();
+        return markdown;
+      });
+      hook.doneEach(function () {
+        if (!window.AbcjsFx) return;
+        // Forget the players of the previous page
+        for (var i = AbcjsFx.players.length - 1; i >= 0; i--) {
+          if (!AbcjsFx.players[i].root.isConnected) AbcjsFx.players.splice(i, 1);
+        }
+        // The examples follow the language of the page (unless the reader chose one in a ⋮ menu)
+        updateLanguageLinks(vm.route.path);
+        AbcjsFx.defaultLang = /^\/fr\//.test(vm.route.path) ? "fr" : "en";
+        AbcjsFx.init(document.querySelector(".markdown-section"));
+      });
+    }
+
+    /** FR / EN links in the navbar keep the current page. */
+    function updateLanguageLinks(path) {
+      var en = path.replace(/^\/fr\//, "/");
+      var fr = "/fr" + (en === "/" ? "/" : en);
+      document.querySelectorAll(".app-nav a").forEach(function (a) {
+        var label = a.textContent.trim();
+        if (label === "English") a.setAttribute("href", "#" + en);
+        if (label === "Français") a.setAttribute("href", "#" + fr);
+      });
+      document.documentElement.lang = /^\/fr\//.test(path) ? "fr" : "en";
+    }
+
+    window.$docsify = {
+      name: "abcjs-fx",
+      repo: "https://github.com/fxpar/abcjs-fx",
+      loadSidebar: true,
+      loadNavbar: true,
+      subMaxLevel: 2,
+      auto2top: true,
+      relativePath: false,
+      // Each language has its own sidebar (/_sidebar.md, /fr/_sidebar.md); the navbar is shared
+      alias: {
+        "/fr/.*/_sidebar.md": "/fr/_sidebar.md",
+        "/.*/_navbar.md": "/_navbar.md"
+      },
+      search: {
+        paths: "auto",
+        depth: 3,
+        placeholder: { "/fr/": "Rechercher", "/": "Search" },
+        noData: { "/fr/": "Aucun résultat", "/": "No results" }
+      },
+      pagination: {
+        previousText: { "/fr/": "Précédent", "/": "Previous" },
+        nextText: { "/fr/": "Suivant", "/": "Next" },
+        crossChapter: true,
+        crossChapterText: true
+      },
+      copyCode: {
+        buttonText: { "/fr/": "Copier", "/": "Copy" },
+        successText: { "/fr/": "Copié", "/": "Copied" }
+      },
+      plugins: [abcjsFxDocs]
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/docsify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@3.0.0/dist/docsify-copy-code.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2.10.1/dist/docsify-pagination.min.js"></script>
+</body>
+</html>

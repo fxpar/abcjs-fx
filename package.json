@@ -1,0 +1,34 @@
+{
+  "name": "abcjs-fx",
+  "version": "9.0.0",
+  "description": "Drop-in ABC music player/editor built on abcjs: tunebooks, transposition, swing, metronome, count-in, voice muting, MIDI export, and chord diagrams in the score.",
+  "main": "src/abcjs-fx.js",
+  "files": [
+    "src/"
+  ],
+  "scripts": {
+    "sync-docs": "node scripts/sync-docs.mjs",
+    "check": "node --check src/abcjs-fx.js && node --check src/abcjs-fx-diagrams.js && node --check src/chord-library.js"
+  },
+  "peerDependencies": {
+    "abcjs": ">=6.4.0"
+  },
+  "keywords": [
+    "abc",
+    "abcjs",
+    "music",
+    "notation",
+    "sheet-music",
+    "player",
+    "chord-diagrams",
+    "ukulele",
+    "guitar"
+  ],
+  "author": "fxpar",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fxpar/abcjs-fx.git"
+  },
+  "homepage": "https://fxpar.github.io/abcjs-fx/"
+}

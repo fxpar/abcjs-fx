@@ -1,0 +1,44 @@
+/* abcjs-fx documentation — small additions to the Docsify "vue" theme */
+:root {
+  --theme-color: #0073aa;
+}
+
+/* Live examples */
+.markdown-section .abcp {
+  margin: 1.2em 0 2em;
+  padding: 12px;
+  border: 1px solid #e6e8eb;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+}
+.markdown-section .abcp::before {
+  content: "▶ Live";
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: #0073aa;
+  margin-bottom: 6px;
+}
+html[lang="fr"] .markdown-section .abcp::before { content: "▶ En direct"; }
+
+/* The theme styles every <p>/<ul>/<label> in the content: restore the player's own layout */
+.markdown-section .abcp ul,
+.markdown-section .abcp li { margin: 0; padding: 0; }
+.markdown-section .abcp label { font-size: 13px; }
+.markdown-section .abcp textarea { max-width: none; }
+
+/* Attribute tables */
+.markdown-section table { display: table; width: 100%; }
+.markdown-section td code { white-space: nowrap; }
+
+/* "Try it" hints */
+.markdown-section .tip-try {
+  background: #f3f9fd;
+  border-left: 4px solid #0073aa;
+  padding: 8px 14px;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}

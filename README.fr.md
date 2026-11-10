@@ -2,6 +2,8 @@
 
 [🇬🇧 English version](README.md) · [📖 Documentation et exemples en direct](https://fxpar.github.io/abcjs-fx/#/fr/)
 
+<p align="center"><img src="images/abcjs-fx-fr.png" alt="abcjs-fx : partition, lecteur audio et panneau d'options" width="700"></p>
+
 **Un lecteur et éditeur de musique ABC prêt à l'emploi, basé sur [abcjs](https://www.abcjs.net/).**
 Écrivez un morceau en notation ABC dans un `<textarea>` ; abcjs-fx le transforme en partition avec
 lecteur audio, menu de recueil et outils de travail. Aucune compilation, aucune dépendance autre qu'abcjs.
@@ -23,22 +25,39 @@ K:C
 
 ## Fonctionnalités
 
+### Partition, audio et outils de travail
+
 * **Partition + audio** — synthétiseur, curseur animé, clic sur la partition pour lancer / suspendre,
   clic sur une note pour y sauter.
-* **Recueils** — plusieurs morceaux `X:` avec menu précédent / suivant, en-tête commun, collage d'un
-  recueil entier.
 * **Outils de travail** — transposition (partition, son et noms d'accords), swing, accords coupés,
   métronome, décompte d'une mesure (joué une seule fois en boucle).
-* **Voix** — couper ou écouter seule chaque voix d'une partition à plusieurs voix.
-* **Tablature** — numéros de case sur fond blanc, lisibles partout.
-* **Export** — MIDI (ce que vous entendez), ABC du morceau, recueil complet avec vos modifications.
 * **Éditeur en direct** — la partition suit la frappe ; les avertissements d'abcjs sont listés.
+* **Export** — MIDI (ce que vous entendez), ABC du morceau, recueil complet avec vos modifications.
 * **Modes d'affichage** — `editor`, `audio`, `midi` (lecteur seul), `paper` (partition seule).
+* **Tablature** — numéros de case sur fond blanc, lisibles partout.
 * **Interface en français / anglais** — langue du navigateur détectée, menu de langue dans le lecteur
   (mémorisé), infobulles de la barre audio d'abcjs traduites ; extensible à d'autres langues.
-* **Diagrammes d'accords (extension)** — diagrammes dessinés à la place des noms d'accords, qui
-  suivent la transposition ; forme modifiable accord par accord ; formes calculées pour les accords
-  absents de la bibliothèque.
+
+### Recueils
+
+Plusieurs morceaux `X:` dans un même textarea donnent un menu précédent / suivant ; un en-tête commun
+s'applique à tous les morceaux, et coller un recueil entier dans l'éditeur ajoute ses morceaux.
+
+<p align="center"><img src="images/abcjs-fx-recueil-fr.png" alt="Menu du recueil" width="640"></p>
+
+### Voix : couper et solo
+
+Chaque voix d'une partition à plusieurs voix peut être coupée ou écoutée seule, depuis un accordéon en
+bas du panneau d'options.
+
+<p align="center"><img src="images/abcjs-fx-voix-fr.png" alt="Accordéon des voix avec couper et solo" width="560"></p>
+
+### Diagrammes d'accords (extension)
+
+Les diagrammes sont dessinés à la place des noms d'accords et suivent la transposition ; la forme se
+change accord par accord, et les accords absents de la bibliothèque reçoivent des formes calculées.
+
+<p align="center"><img src="images/abcjs-fx-diagrammes-fr.png" alt="Diagrammes d'accords de ukulélé dans la partition" width="640"></p>
 
 ## Fichiers
 
@@ -49,6 +68,7 @@ K:C
 | [`src/chord-library.js`](src/chord-library.js) | formes d'accords ukulélé et guitare utilisées par l'extension (~115 Ko) |
 | [`docs/`](docs/) | site de documentation ([Docsify](https://docsify.js.org)), publié avec GitHub Pages |
 | [`examples/`](examples/) | une page autonome pour essayer les sources en local |
+| [`images/`](images/) | captures d'écran utilisées dans ce README |
 
 Nécessite **abcjs 6.4 ou plus récent** (testé avec 6.7.2).
 

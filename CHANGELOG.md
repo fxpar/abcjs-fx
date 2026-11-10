@@ -1,5 +1,12 @@
 # Changelog / Historique
 
+## 9.1.1 — 2026-11
+
+### Changed / Modifié
+- `abcjs-reentrant-tab.js` 1.0.1: chords are ranked like the original abcjs algorithm — highest fret,
+  then **sum of frets**, then stretch (each note stays on its lowest-fret string); on unisons, earlier
+  notes go to lower strings. / Classement des accords aligné sur l'algorithme d'origine d'abcjs.
+
 ## 9.1.0 — 2026-11
 
 ### Added / Ajouts

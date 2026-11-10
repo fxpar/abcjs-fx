@@ -1,7 +1,7 @@
 /*!
  * abcjs-reentrant-tab.js — reentrant tunings for abcjs tablatures
  * (high-G ukulele, 5-string banjo, baritone/12-string tricks…)
- * Version 1.0.0 — https://github.com/fxpar/abcjs-fx — MIT
+ * Version 1.0.1 — https://github.com/fxpar/abcjs-fx — MIT
  *
  * Works with plain abcjs (>= 6.2), with or without abcjs-fx. Load it after abcjs:
  *   <script src="abcjs-basic-min.js"></script>
@@ -14,7 +14,8 @@
  *      abcjs accepts it, then the real string pitches are restored.
  *   2. notesToNumber: abcjs computes the notes as usual, then every note is re-assigned to a string of
  *      the real tuning: lowest fret first (closest string to the previous note on ties); in chords, one
- *      note per string, minimizing the highest fret, then the stretch, then the sum of frets.
+ *      note per string, minimizing the highest fret, then the sum of frets, then the stretch
+ *      (same ranking as abcjs; on unisons, earlier notes go to lower strings).
  * The string-assignment algorithm comes from a proposed change to abcjs by fxpar
  * (branch feature/tablatures-reentrant-tuning).
  *
@@ -24,7 +25,7 @@
   "use strict";
 
   var api = {
-    version: "1.0.0",
+    version: "1.0.1",
     installed: false,
     install: install,
     isReentrant: isReentrant,
@@ -118,7 +119,7 @@
 
   /**
    * One note per string. Prefers placing every note; then the lowest highest fret, the smallest
-   * stretch and the smallest sum of frets. Backtracking is cheap: chords rarely exceed 6 notes.
+   * sum of frets and the smallest stretch. Backtracking is cheap: chords rarely exceed 6 notes.
    */
   function bestAssignment(lists) {
     var n = lists.length, used = {}, current = new Array(n), best = null, bestCost = null;
@@ -131,16 +132,24 @@
       }
       return { count: count, max: max, spread: max - min, sum: sum };
     }
-    function better(a, b) {
-      if (a.count !== b.count) return a.count > b.count;
-      if (a.max !== b.max) return a.max < b.max;
-      if (a.spread !== b.spread) return a.spread < b.spread;
-      return a.sum < b.sum;
+    // Same ranking as the original abcjs algorithm: each note on its lowest-fret string
+    // (highest fret, then sum of frets, then spread); on a perfect tie (unisons),
+    // earlier notes go to lower strings.
+    function better(a, aCost, b, bCost) {
+      if (aCost.count !== bCost.count) return aCost.count > bCost.count;
+      if (aCost.max !== bCost.max) return aCost.max < bCost.max;
+      if (aCost.sum !== bCost.sum) return aCost.sum < bCost.sum;
+      if (aCost.spread !== bCost.spread) return aCost.spread < bCost.spread;
+      for (var i = 0; i < a.length; i++) {
+        var ai = a[i] ? a[i].arrIndex : Infinity, bi = b[i] ? b[i].arrIndex : Infinity;
+        if (ai !== bi) return ai < bi;
+      }
+      return false;
     }
     (function walk(k) {
       if (k === n) {
         var c = cost(current);
-        if (!best || better(c, bestCost)) { best = current.slice(); bestCost = c; }
+        if (!best || better(current, c, best, bestCost)) { best = current.slice(); bestCost = c; }
         return;
       }
       for (var i = 0; i < lists[k].length; i++) {

@@ -22,15 +22,24 @@ D | "G"G2 B/G/ | B2 A | "Em"G2 E | "C"D2 D | "G"G2 B/G/ | B2 A/B/ | "D"d3- | d2 
 
 ## Other instruments and tunings
 
-abcjs knows `violin`, `fiddle`, `mandolin`, `guitar` and `fiveString` (banjo); other tunings can be
-given, from the lowest string to the highest — here a low-G ukulele (G, C E A):
+abcjs knows five instruments. **The number of tab lines comes from the instrument, not from the
+tuning**: for a 4-string tuning (ukulele, mandolin…), choose a 4-line instrument.
+
+| `instrument` | Tab lines | Default tuning |
+|---|:-:|---|
+| `violin`, `fiddle`, `mandolin` | 4 | G D A E |
+| `fiveString` (banjo) | 5 | C G D A E |
+| `guitar` | 6 | E A D G B E |
+
+Other tunings are given from the lowest string to the highest — here a low-G ukulele (G, C E A) on a
+4-line instrument:
 
 ```html
 <textarea data-abcjs-fx
-  options='{"tablature": [{"instrument": "guitar", "label": "Ukulele (low G)", "tuning": ["G,", "C", "E", "A"]}]}'>…</textarea>
+  options='{"tablature": [{"instrument": "violin", "label": "Ukulele (low G)", "tuning": ["G,", "C", "E", "A"]}]}'>…</textarea>
 ```
 
-<textarea data-abcjs-fx mode="audio" options='{"tablature": [{"instrument": "guitar", "label": "Ukulele (low G)", "tuning": ["G,", "C", "E", "A"]}]}'>
+<textarea data-abcjs-fx mode="audio" options='{"tablature": [{"instrument": "violin", "label": "Ukulele (low G)", "tuning": ["G,", "C", "E", "A"]}]}'>
 X:1
 T:C major scale on ukulele
 M:4/4
@@ -65,8 +74,6 @@ C D E F | G A B c | "C"[CEGc]2 "Am"[CEAA]2 | "F"[CFAA]2 "G7"[DFGB]2 | "C"[CEGc]4
 
 * Notes are placed on the lowest fret available; in chords, one note per string, with the smallest
   stretch — the C chord above becomes the usual `0 0 0 3`.
-* Use a 4-line instrument (`violin`, `mandolin`) for a 4-string tuning: the number of tab lines comes
-  from the instrument.
 * The patch does not modify abcjs: it hooks into its tablature plugin when the page loads. It also works
   **without abcjs-fx**, with `ABCJS.renderAbc`. If a future abcjs version changes its internals, the
   patch disables itself (warning in the console) and abcjs behaves as before.

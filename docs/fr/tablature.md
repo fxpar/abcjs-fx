@@ -23,15 +23,24 @@ D | "G"G2 B/G/ | B2 A | "Em"G2 E | "C"D2 D | "G"G2 B/G/ | B2 A/B/ | "D"d3- | d2 
 
 ## Autres instruments et accordages
 
-abcjs connaît `violin`, `fiddle`, `mandolin`, `guitar` et `fiveString` (banjo) ; d'autres accordages
-peuvent être donnés, de la corde la plus grave à la plus aiguë — ici un ukulélé à Sol grave (G, C E A) :
+abcjs connaît cinq instruments. **Le nombre de lignes de la tablature vient de l'instrument, pas de
+l'accordage** : pour un accordage à 4 cordes (ukulélé, mandoline…), choisissez un instrument à 4 lignes.
+
+| `instrument` | Lignes | Accordage par défaut |
+|---|:-:|---|
+| `violin`, `fiddle`, `mandolin` | 4 | Sol Ré La Mi |
+| `fiveString` (banjo) | 5 | Do Sol Ré La Mi |
+| `guitar` | 6 | Mi La Ré Sol Si Mi |
+
+Les autres accordages se donnent de la corde la plus grave à la plus aiguë — ici un ukulélé à Sol grave
+(G, C E A) sur un instrument à 4 lignes :
 
 ```html
 <textarea data-abcjs-fx
-  options='{"tablature": [{"instrument": "guitar", "label": "Ukulélé (Sol grave)", "tuning": ["G,", "C", "E", "A"]}]}'>…</textarea>
+  options='{"tablature": [{"instrument": "violin", "label": "Ukulélé (Sol grave)", "tuning": ["G,", "C", "E", "A"]}]}'>…</textarea>
 ```
 
-<textarea data-abcjs-fx mode="audio" options='{"tablature": [{"instrument": "guitar", "label": "Ukulélé (Sol grave)", "tuning": ["G,", "C", "E", "A"]}]}'>
+<textarea data-abcjs-fx mode="audio" options='{"tablature": [{"instrument": "violin", "label": "Ukulélé (Sol grave)", "tuning": ["G,", "C", "E", "A"]}]}'>
 X:1
 T:Gamme de Do au ukulélé
 M:4/4
@@ -66,8 +75,6 @@ C D E F | G A B c | "C"[CEGc]2 "Am"[CEAA]2 | "F"[CFAA]2 "G7"[DFGB]2 | "C"[CEGc]4
 
 * Les notes sont placées sur la case la plus basse possible ; dans les accords, une note par corde,
   avec l'écart le plus faible — l'accord de Do ci-dessus donne le doigté habituel `0 0 0 3`.
-* Pour un accordage à 4 cordes, utilisez un instrument à 4 lignes (`violin`, `mandolin`) : le nombre de
-  lignes de la tablature vient de l'instrument.
 * Le patch ne modifie pas abcjs : il se greffe sur son module de tablature au chargement de la page. Il
   fonctionne aussi **sans abcjs-fx**, avec `ABCJS.renderAbc`. Si une future version d'abcjs change son
   fonctionnement interne, le patch se désactive (avertissement dans la console) et abcjs se comporte
